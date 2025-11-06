@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Claude Flow internal
+.claude-flow/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+target/
+
+# Logs
+*.log
