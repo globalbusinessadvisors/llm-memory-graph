@@ -1,0 +1,46 @@
+[package]
+name = "llm-memory-graph-types"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/llm-memory-graph-types"
+description = "Core types for the LLM Memory Graph system"
+readme = "README.md"
+keywords = ["llm", "types", "graph", "memory", "ai"]
+categories = ["data-structures", "development-tools"]
+
+[dependencies]
+# Core serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Identifiers and time
+uuid = { workspace = true }
+chrono = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+
+# Utilities
+regex = { workspace = true }
+
+# Async runtime (optional for retry)
+tokio = { workspace = true, optional = true }
+
+# Optional dependencies for error conversions
+sled = { workspace = true, optional = true }
+bincode = { workspace = true, optional = true }
+rmp-serde = { workspace = true, optional = true }
+prometheus = { workspace = true, optional = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[features]
+default = ["storage", "tokio"]
+storage = ["sled", "bincode", "rmp-serde"]
+metrics = ["prometheus"]
+tokio = ["dep:tokio"]

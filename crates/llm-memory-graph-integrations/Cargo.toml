@@ -1,0 +1,43 @@
+[package]
+name = "llm-memory-graph-integrations"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/llm-memory-graph-integrations"
+description = "Integration clients for LLM-Registry and Data-Vault services"
+readme = "README.md"
+keywords = ["llm", "integrations", "registry", "vault", "api"]
+categories = ["api-bindings", "development-tools"]
+
+[dependencies]
+# Workspace crates
+llm-memory-graph-types = { workspace = true }
+
+# Core serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# HTTP client
+reqwest = { workspace = true }
+
+# Async runtime
+tokio = { workspace = true }
+async-trait = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+
+# Utilities
+chrono = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+wiremock = "0.6"
+
+[features]
+default = ["registry", "vault"]
+registry = []
+vault = []

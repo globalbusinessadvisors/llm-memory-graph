@@ -1,0 +1,54 @@
+[package]
+name = "llm-memory-graph-client"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/llm-memory-graph-client"
+description = "Rust client for the LLM Memory Graph gRPC service"
+readme = "README.md"
+keywords = ["llm", "graph", "client", "grpc", "ai"]
+categories = ["api-bindings", "asynchronous", "development-tools"]
+
+[dependencies]
+# Workspace crates
+llm-memory-graph-types = { workspace = true }
+
+# Core
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Async runtime
+tokio = { workspace = true }
+tokio-stream = { workspace = true }
+futures = { workspace = true }
+async-trait = { workspace = true }
+
+# gRPC
+tonic = { workspace = true }
+prost = { workspace = true }
+prost-types = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+
+# Identifiers
+uuid = { workspace = true }
+chrono = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+tokio = { workspace = true }
+
+[build-dependencies]
+tonic-build = { workspace = true }
+
+[features]
+default = []
+tls = []

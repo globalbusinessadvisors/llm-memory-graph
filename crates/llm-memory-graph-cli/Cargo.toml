@@ -1,0 +1,48 @@
+[package]
+name = "llm-memory-graph-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/llm-memory-graph-cli"
+description = "Command-line management tools for LLM Memory Graph"
+readme = "README.md"
+keywords = ["llm", "cli", "database", "management", "tools"]
+categories = ["command-line-utilities", "development-tools"]
+
+[[bin]]
+name = "llm-memory-graph"
+path = "src/main.rs"
+
+[dependencies]
+# Workspace crates
+llm-memory-graph = { workspace = true }
+llm-memory-graph-types = { workspace = true }
+
+# CLI framework
+clap = { version = "4.5", features = ["derive", "cargo"] }
+
+# Serialization and output
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Terminal output
+colored = "2.1"
+comfy-table = "7.1"
+
+# Async runtime
+tokio = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+
+# Time formatting
+chrono = { workspace = true }
+
+# UUID parsing
+uuid = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
