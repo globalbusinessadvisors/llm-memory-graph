@@ -421,10 +421,7 @@ impl PluginManager {
     ///
     /// This is a placeholder for future dynamic plugin loading functionality.
     /// Currently, plugins must be compiled into the application.
-    pub fn load_from_directory(
-        &mut self,
-        _path: impl AsRef<Path>,
-    ) -> Result<(), PluginError> {
+    pub fn load_from_directory(&mut self, _path: impl AsRef<Path>) -> Result<(), PluginError> {
         // TODO: Implement dynamic plugin loading using libloading or similar
         warn!("Dynamic plugin loading not yet implemented");
         Ok(())
