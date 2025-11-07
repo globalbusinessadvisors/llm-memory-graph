@@ -392,7 +392,10 @@ impl AsyncQueryBuilder {
             && self.offset == 0
             && self.limit.is_none()
         {
-            return self.storage.count_session_nodes(&self.session_filter.unwrap()).await;
+            return self
+                .storage
+                .count_session_nodes(&self.session_filter.unwrap())
+                .await;
         }
 
         // Otherwise, stream and count to avoid loading all into memory
@@ -418,7 +421,9 @@ mod tests {
     async fn test_query_builder_creation() {
         let dir = tempdir().unwrap();
         let backend = AsyncSledBackend::open(dir.path()).await.unwrap();
-        let builder = AsyncQueryBuilder::new(Arc::new(backend) as Arc<dyn crate::storage::AsyncStorageBackend>);
+        let builder = AsyncQueryBuilder::new(
+            Arc::new(backend) as Arc<dyn crate::storage::AsyncStorageBackend>
+        );
 
         let results = builder.execute().await.unwrap();
         assert_eq!(results.len(), 0);
@@ -427,7 +432,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_with_session_filter() {
         let dir = tempdir().unwrap();
-        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap()) as Arc<dyn crate::storage::AsyncStorageBackend>;
+        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap())
+            as Arc<dyn crate::storage::AsyncStorageBackend>;
 
         // Create test data
         let session = ConversationSession::new();
@@ -451,7 +457,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_with_node_type_filter() {
         let dir = tempdir().unwrap();
-        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap()) as Arc<dyn crate::storage::AsyncStorageBackend>;
+        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap())
+            as Arc<dyn crate::storage::AsyncStorageBackend>;
 
         let session = ConversationSession::new();
         backend
@@ -482,7 +489,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_with_limit_and_offset() {
         let dir = tempdir().unwrap();
-        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap()) as Arc<dyn crate::storage::AsyncStorageBackend>;
+        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap())
+            as Arc<dyn crate::storage::AsyncStorageBackend>;
 
         let session = ConversationSession::new();
         backend
@@ -522,7 +530,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_streaming() {
         let dir = tempdir().unwrap();
-        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap()) as Arc<dyn crate::storage::AsyncStorageBackend>;
+        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap())
+            as Arc<dyn crate::storage::AsyncStorageBackend>;
 
         let session = ConversationSession::new();
         backend
@@ -553,7 +562,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_count() {
         let dir = tempdir().unwrap();
-        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap()) as Arc<dyn crate::storage::AsyncStorageBackend>;
+        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap())
+            as Arc<dyn crate::storage::AsyncStorageBackend>;
 
         let session = ConversationSession::new();
         backend
@@ -581,7 +591,8 @@ mod tests {
     #[tokio::test]
     async fn test_streaming_with_limit() {
         let dir = tempdir().unwrap();
-        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap()) as Arc<dyn crate::storage::AsyncStorageBackend>;
+        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap())
+            as Arc<dyn crate::storage::AsyncStorageBackend>;
 
         let session = ConversationSession::new();
         backend

@@ -9,9 +9,9 @@ use crate::observatory::{
 };
 use crate::storage::{AsyncSledBackend, AsyncStorageBackend, StorageCache};
 use crate::types::{
-    AgentId, AgentNode, Config, ConversationSession, Edge, EdgeType, Node, NodeId,
-    PromptMetadata, PromptNode, PromptTemplate, ResponseMetadata, ResponseNode, SessionId,
-    TemplateId, TokenUsage, ToolInvocation,
+    AgentId, AgentNode, Config, ConversationSession, Edge, EdgeType, Node, NodeId, PromptMetadata,
+    PromptNode, PromptTemplate, ResponseMetadata, ResponseNode, SessionId, TemplateId, TokenUsage,
+    ToolInvocation,
 };
 use chrono::Utc;
 use std::collections::HashMap;
@@ -203,7 +203,10 @@ impl AsyncMemoryGraph {
         self.backend.store_node(&node).await?;
 
         // Cache the session in both session cache and node cache
-        self.sessions.write().await.insert(session.id, session.clone());
+        self.sessions
+            .write()
+            .await
+            .insert(session.id, session.clone());
         self.cache.insert_node(session.node_id, node).await;
 
         // Record metrics
@@ -252,7 +255,10 @@ impl AsyncMemoryGraph {
         self.backend.store_node(&node).await?;
 
         // Cache the session in both session cache and node cache
-        self.sessions.write().await.insert(session.id, session.clone());
+        self.sessions
+            .write()
+            .await
+            .insert(session.id, session.clone());
         self.cache.insert_node(session.node_id, node).await;
 
         Ok(session)
@@ -281,7 +287,10 @@ impl AsyncMemoryGraph {
             if let Node::Session(session) = node {
                 if session.id == session_id {
                     // Update cache
-                    self.sessions.write().await.insert(session_id, session.clone());
+                    self.sessions
+                        .write()
+                        .await
+                        .insert(session_id, session.clone());
                     return Ok(session);
                 }
             }
@@ -588,9 +597,7 @@ impl AsyncMemoryGraph {
     /// This invalidates the cache entry for the template to ensure consistency.
     pub async fn update_template(&self, template: PromptTemplate) -> Result<()> {
         let template_node_id = template.node_id;
-        self.backend
-            .store_node(&Node::Template(template))
-            .await?;
+        self.backend.store_node(&Node::Template(template)).await?;
 
         // Invalidate cache to ensure consistency
         self.cache.invalidate_node(&template_node_id).await;
@@ -636,9 +643,7 @@ impl AsyncMemoryGraph {
         let template_id = template.id;
 
         // Store the new template
-        self.backend
-            .store_node(&Node::Template(template))
-            .await?;
+        self.backend.store_node(&Node::Template(template)).await?;
 
         // Create Inherits edge
         let edge = Edge::new(template_node_id, parent_node_id, EdgeType::Inherits);
@@ -704,9 +709,7 @@ impl AsyncMemoryGraph {
     /// This invalidates the cache entry for the tool to ensure consistency.
     pub async fn update_tool_invocation(&self, tool: ToolInvocation) -> Result<()> {
         let tool_id = tool.id;
-        self.backend
-            .store_node(&Node::ToolInvocation(tool))
-            .await?;
+        self.backend.store_node(&Node::ToolInvocation(tool)).await?;
 
         // Invalidate cache to ensure consistency
         self.cache.invalidate_node(&tool_id).await;
@@ -876,9 +879,7 @@ impl AsyncMemoryGraph {
     ) -> Result<Vec<NodeId>> {
         let futures: Vec<_> = responses
             .into_iter()
-            .map(|(prompt_id, content, usage)| {
-                self.add_response(prompt_id, content, usage, None)
-            })
+            .map(|(prompt_id, content, usage)| self.add_response(prompt_id, content, usage, None))
             .collect();
 
         futures::future::try_join_all(futures).await
@@ -902,9 +903,7 @@ impl AsyncMemoryGraph {
     /// # }
     /// ```
     pub async fn create_sessions_batch(&self, count: usize) -> Result<Vec<ConversationSession>> {
-        let futures: Vec<_> = (0..count)
-            .map(|_| self.create_session())
-            .collect();
+        let futures: Vec<_> = (0..count).map(|_| self.create_session()).collect();
 
         futures::future::try_join_all(futures).await
     }
@@ -933,10 +932,7 @@ impl AsyncMemoryGraph {
     /// # }
     /// ```
     pub async fn get_nodes_batch(&self, ids: Vec<NodeId>) -> Result<Vec<Option<Node>>> {
-        let futures: Vec<_> = ids
-            .iter()
-            .map(|id| self.get_node(id))
-            .collect();
+        let futures: Vec<_> = ids.iter().map(|id| self.get_node(id)).collect();
 
         futures::future::try_join_all(futures).await
     }
@@ -964,10 +960,7 @@ impl AsyncMemoryGraph {
     /// # }
     /// ```
     pub async fn delete_nodes_batch(&self, ids: Vec<NodeId>) -> Result<()> {
-        let futures: Vec<_> = ids
-            .iter()
-            .map(|id| self.backend.delete_node(id))
-            .collect();
+        let futures: Vec<_> = ids.iter().map(|id| self.backend.delete_node(id)).collect();
 
         futures::future::try_join_all(futures).await?;
         Ok(())
@@ -1014,7 +1007,10 @@ impl AsyncMemoryGraph {
 
                 // Add response if provided
                 let response_id = if let Some((response_content, usage)) = response_data {
-                    Some(self.add_response(prompt_id, response_content, usage, None).await?)
+                    Some(
+                        self.add_response(prompt_id, response_content, usage, None)
+                            .await?,
+                    )
                 } else {
                     None
                 };
@@ -1241,9 +1237,7 @@ mod tests {
 
         // Verify INVOKES edge was created
         let edges = graph.get_outgoing_edges(&response_id).await.unwrap();
-        let invokes_edge = edges
-            .iter()
-            .find(|e| e.edge_type == EdgeType::Invokes);
+        let invokes_edge = edges.iter().find(|e| e.edge_type == EdgeType::Invokes);
         assert!(invokes_edge.is_some());
     }
 
@@ -1414,7 +1408,10 @@ mod tests {
         assert_eq!(stats.node_count, 16); // 1 session + 15 prompts
 
         // Batch delete all prompts
-        graph.delete_nodes_batch(ids_to_delete.clone()).await.unwrap();
+        graph
+            .delete_nodes_batch(ids_to_delete.clone())
+            .await
+            .unwrap();
 
         // Note: Current implementation may cache nodes, so deletion might not be immediate
         // This test verifies the batch operation completes without errors
@@ -1458,10 +1455,10 @@ mod tests {
 
         // Verify structure
         assert!(results[0].1.is_some()); // Has response
-        assert!(results[1].1.is_none());  // No response
+        assert!(results[1].1.is_none()); // No response
         assert!(results[2].1.is_some()); // Has response
         assert!(results[3].1.is_some()); // Has response
-        assert!(results[4].1.is_none());  // No response
+        assert!(results[4].1.is_none()); // No response
 
         // Verify all prompts exist
         for (prompt_id, _) in &results {

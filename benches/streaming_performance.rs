@@ -44,11 +44,7 @@ fn bench_batch_queries(c: &mut Criterion) {
     for size in [10, 100, 500, 1000].iter() {
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter_batched(
-                || {
-                    runtime.block_on(async {
-                        create_test_graph(size).await
-                    })
-                },
+                || runtime.block_on(async { create_test_graph(size).await }),
                 |(graph, session)| {
                     runtime.block_on(async {
                         let results = graph
@@ -79,11 +75,7 @@ fn bench_streaming_queries(c: &mut Criterion) {
     for size in [10, 100, 500, 1000].iter() {
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter_batched(
-                || {
-                    runtime.block_on(async {
-                        create_test_graph(size).await
-                    })
-                },
+                || runtime.block_on(async { create_test_graph(size).await }),
                 |(graph, session)| {
                     runtime.block_on(async {
                         let query = graph
@@ -118,20 +110,11 @@ fn bench_count_operations(c: &mut Criterion) {
     for size in [100, 500, 1000, 5000].iter() {
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter_batched(
-                || {
-                    runtime.block_on(async {
-                        create_test_graph(size).await
-                    })
-                },
+                || runtime.block_on(async { create_test_graph(size).await }),
                 |(graph, session)| {
                     runtime.block_on(async {
                         // Efficient count (no filtering)
-                        let count = graph
-                            .query()
-                            .session(session.id)
-                            .count()
-                            .await
-                            .unwrap();
+                        let count = graph.query().session(session.id).count().await.unwrap();
                         black_box(count);
                     })
                 },
@@ -153,11 +136,7 @@ fn bench_filtered_count(c: &mut Criterion) {
     for size in [100, 500, 1000].iter() {
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter_batched(
-                || {
-                    runtime.block_on(async {
-                        create_test_graph(size).await
-                    })
-                },
+                || runtime.block_on(async { create_test_graph(size).await }),
                 |(graph, session)| {
                     runtime.block_on(async {
                         // Filtered count (requires iteration)
@@ -189,11 +168,7 @@ fn bench_pagination(c: &mut Criterion) {
     // Test pagination on 1000 node dataset
     group.bench_function("page_10_of_1000", |b| {
         b.iter_batched(
-            || {
-                runtime.block_on(async {
-                    create_test_graph(1000).await
-                })
-            },
+            || runtime.block_on(async { create_test_graph(1000).await }),
             |(graph, session)| {
                 runtime.block_on(async {
                     // Get page 10 (items 90-99)
@@ -215,11 +190,7 @@ fn bench_pagination(c: &mut Criterion) {
 
     group.bench_function("page_10_stream_of_1000", |b| {
         b.iter_batched(
-            || {
-                runtime.block_on(async {
-                    create_test_graph(1000).await
-                })
-            },
+            || runtime.block_on(async { create_test_graph(1000).await }),
             |(graph, session)| {
                 runtime.block_on(async {
                     // Get page 10 via streaming
@@ -255,75 +226,75 @@ fn bench_storage_streaming(c: &mut Criterion) {
 
     for size in [100, 500, 1000].iter() {
         // Batch loading
-        group.bench_with_input(
-            BenchmarkId::new("batch", size),
-            size,
-            |b, &size| {
-                b.iter_batched(
-                    || {
-                        runtime.block_on(async {
-                            let dir = tempdir().unwrap();
-                            let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap()) as Arc<dyn AsyncStorageBackend>;
+        group.bench_with_input(BenchmarkId::new("batch", size), size, |b, &size| {
+            b.iter_batched(
+                || {
+                    runtime.block_on(async {
+                        let dir = tempdir().unwrap();
+                        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap())
+                            as Arc<dyn AsyncStorageBackend>;
 
-                            let session = ConversationSession::new();
-                            backend.store_node(&Node::Session(session.clone())).await.unwrap();
+                        let session = ConversationSession::new();
+                        backend
+                            .store_node(&Node::Session(session.clone()))
+                            .await
+                            .unwrap();
 
-                            for i in 0..size {
-                                let prompt = PromptNode::new(session.id, format!("Prompt {}", i));
-                                backend.store_node(&Node::Prompt(prompt)).await.unwrap();
-                            }
+                        for i in 0..size {
+                            let prompt = PromptNode::new(session.id, format!("Prompt {}", i));
+                            backend.store_node(&Node::Prompt(prompt)).await.unwrap();
+                        }
 
-                            (backend, session.id)
-                        })
-                    },
-                    |(backend, session_id)| {
-                        runtime.block_on(async {
-                            let nodes = backend.get_session_nodes(&session_id).await.unwrap();
-                            black_box(nodes.len());
-                        })
-                    },
-                    criterion::BatchSize::SmallInput,
-                );
-            },
-        );
+                        (backend, session.id)
+                    })
+                },
+                |(backend, session_id)| {
+                    runtime.block_on(async {
+                        let nodes = backend.get_session_nodes(&session_id).await.unwrap();
+                        black_box(nodes.len());
+                    })
+                },
+                criterion::BatchSize::SmallInput,
+            );
+        });
 
         // Streaming
-        group.bench_with_input(
-            BenchmarkId::new("stream", size),
-            size,
-            |b, &size| {
-                b.iter_batched(
-                    || {
-                        runtime.block_on(async {
-                            let dir = tempdir().unwrap();
-                            let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap()) as Arc<dyn AsyncStorageBackend>;
+        group.bench_with_input(BenchmarkId::new("stream", size), size, |b, &size| {
+            b.iter_batched(
+                || {
+                    runtime.block_on(async {
+                        let dir = tempdir().unwrap();
+                        let backend = Arc::new(AsyncSledBackend::open(dir.path()).await.unwrap())
+                            as Arc<dyn AsyncStorageBackend>;
 
-                            let session = ConversationSession::new();
-                            backend.store_node(&Node::Session(session.clone())).await.unwrap();
+                        let session = ConversationSession::new();
+                        backend
+                            .store_node(&Node::Session(session.clone()))
+                            .await
+                            .unwrap();
 
-                            for i in 0..size {
-                                let prompt = PromptNode::new(session.id, format!("Prompt {}", i));
-                                backend.store_node(&Node::Prompt(prompt)).await.unwrap();
-                            }
+                        for i in 0..size {
+                            let prompt = PromptNode::new(session.id, format!("Prompt {}", i));
+                            backend.store_node(&Node::Prompt(prompt)).await.unwrap();
+                        }
 
-                            (backend, session.id)
-                        })
-                    },
-                    |(backend, session_id)| {
-                        runtime.block_on(async {
-                            let mut stream = backend.get_session_nodes_stream(&session_id);
-                            let mut count = 0;
-                            while let Some(result) = stream.next().await {
-                                result.unwrap();
-                                count += 1;
-                            }
-                            black_box(count);
-                        })
-                    },
-                    criterion::BatchSize::SmallInput,
-                );
-            },
-        );
+                        (backend, session.id)
+                    })
+                },
+                |(backend, session_id)| {
+                    runtime.block_on(async {
+                        let mut stream = backend.get_session_nodes_stream(&session_id);
+                        let mut count = 0;
+                        while let Some(result) = stream.next().await {
+                            result.unwrap();
+                            count += 1;
+                        }
+                        black_box(count);
+                    })
+                },
+                criterion::BatchSize::SmallInput,
+            );
+        });
     }
 
     group.finish();
@@ -339,11 +310,7 @@ fn bench_early_termination(c: &mut Criterion) {
     // Batch: loads all 1000, then takes 10
     group.bench_function("batch_take_10_from_1000", |b| {
         b.iter_batched(
-            || {
-                runtime.block_on(async {
-                    create_test_graph(1000).await
-                })
-            },
+            || runtime.block_on(async { create_test_graph(1000).await }),
             |(graph, session)| {
                 runtime.block_on(async {
                     let results = graph
@@ -364,11 +331,7 @@ fn bench_early_termination(c: &mut Criterion) {
     // Streaming: stops after 10 items
     group.bench_function("stream_take_10_from_1000", |b| {
         b.iter_batched(
-            || {
-                runtime.block_on(async {
-                    create_test_graph(1000).await
-                })
-            },
+            || runtime.block_on(async { create_test_graph(1000).await }),
             |(graph, session)| {
                 runtime.block_on(async {
                     let query = graph

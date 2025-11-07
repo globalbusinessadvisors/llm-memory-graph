@@ -11,9 +11,9 @@
 //! - Build complex multi-agent workflows
 
 use llm_memory_graph::{
-    AgentNode, Config, ContextType, InheritsProperties, InstantiatesProperties,
-    InvokesProperties, MemoryGraph, Priority, PromptTemplate, ReferencesProperties,
-    TransfersToProperties, VariableSpec,
+    AgentNode, Config, ContextType, InheritsProperties, InstantiatesProperties, InvokesProperties,
+    MemoryGraph, Priority, PromptTemplate, ReferencesProperties, TransfersToProperties,
+    VariableSpec,
 };
 use std::collections::HashMap;
 
@@ -87,7 +87,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Some(props) = instantiate_edge.get_instantiates_properties() {
         println!("   ✓ Retrieved properties:");
         println!("     - Template version: {}", props.template_version);
-        println!("     - Variable bindings: {} entries", props.variable_bindings.len());
+        println!(
+            "     - Variable bindings: {} entries",
+            props.variable_bindings.len()
+        );
         println!("     - Instantiation time: {}", props.instantiation_time);
     }
     println!();
@@ -142,7 +145,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let override_sections = vec!["focus_area".to_string()];
     let version_diff = "Added focus_area variable to narrow analysis scope".to_string();
 
-    let inherits_props = InheritsProperties::new(override_sections.clone(), version_diff.clone(), 1);
+    let inherits_props =
+        InheritsProperties::new(override_sections.clone(), version_diff.clone(), 1);
     let inherits_edge = Edge::inherits(child_node_id, parent_node_id, inherits_props);
 
     println!("   Parent: {}", parent_template.name);
@@ -154,7 +158,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // In a full implementation, this edge would be stored
     if let Some(props) = inherits_edge.get_inherits_properties() {
         println!("   ✓ Properties confirmed:");
-        println!("     - Override sections: {} sections", props.override_sections.len());
+        println!(
+            "     - Override sections: {} sections",
+            props.override_sections.len()
+        );
         println!("     - Version diff: {}", props.version_diff);
         println!("     - Depth: {}", props.inheritance_depth);
     }
@@ -181,8 +188,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     let invokes_edge = Edge::invokes(
-        prompt_id,      // From: prompt that triggered tool use
-        agent_node_id,  // To: agent or tool invocation node
+        prompt_id,     // From: prompt that triggered tool use
+        agent_node_id, // To: agent or tool invocation node
         invokes_props,
     );
 

@@ -421,7 +421,10 @@ impl PluginManager {
     ///
     /// This is a placeholder for future dynamic plugin loading functionality.
     /// Currently, plugins must be compiled into the application.
-    pub async fn load_from_directory(&mut self, _path: impl AsRef<Path>) -> Result<(), PluginError> {
+    pub async fn load_from_directory(
+        &mut self,
+        _path: impl AsRef<Path>,
+    ) -> Result<(), PluginError> {
         // TODO: Implement dynamic plugin loading using libloading or similar
         warn!("Dynamic plugin loading not yet implemented");
         Ok(())
@@ -513,7 +516,10 @@ mod tests {
         assert!(manager.is_enabled("test_plugin"));
 
         manager.disable("test_plugin").unwrap();
-        assert_eq!(manager.get_state("test_plugin"), Some(PluginState::Disabled));
+        assert_eq!(
+            manager.get_state("test_plugin"),
+            Some(PluginState::Disabled)
+        );
         assert!(!manager.is_enabled("test_plugin"));
     }
 

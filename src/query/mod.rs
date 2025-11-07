@@ -325,9 +325,9 @@ impl<'a> GraphTraversal<'a> {
             if let Ok(edges) = self.graph.get_outgoing_edges(current) {
                 for edge in edges {
                     // Add target node if not exists
-                    let target_idx = *node_map.entry(edge.to).or_insert_with(|| {
-                        graph.add_node(edge.to)
-                    });
+                    let target_idx = *node_map
+                        .entry(edge.to)
+                        .or_insert_with(|| graph.add_node(edge.to));
 
                     // Add edge
                     graph.add_edge(current_idx, target_idx, edge.edge_type.clone());
@@ -343,9 +343,9 @@ impl<'a> GraphTraversal<'a> {
             if let Ok(edges) = self.graph.get_incoming_edges(current) {
                 for edge in edges {
                     // Add source node if not exists
-                    let source_idx = *node_map.entry(edge.from).or_insert_with(|| {
-                        graph.add_node(edge.from)
-                    });
+                    let source_idx = *node_map
+                        .entry(edge.from)
+                        .or_insert_with(|| graph.add_node(edge.from));
 
                     // Add edge
                     graph.add_edge(source_idx, current_idx, edge.edge_type.clone());

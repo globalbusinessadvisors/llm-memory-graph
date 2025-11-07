@@ -39,7 +39,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let greeting_node_id = greeting_template.node_id;
     let _greeting_id = graph.create_template(greeting_template.clone())?;
-    println!("   Created template: {} (v{})", greeting_template.name, greeting_template.version);
+    println!(
+        "   Created template: {} (v{})",
+        greeting_template.name, greeting_template.version
+    );
 
     // Instantiate the template
     let mut values = HashMap::new();
@@ -95,7 +98,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Valid instantiation (using default priority)
     let mut values = HashMap::new();
-    values.insert("recipient_email".to_string(), "john@example.com".to_string());
+    values.insert(
+        "recipient_email".to_string(),
+        "john@example.com".to_string(),
+    );
     values.insert("subject".to_string(), "Meeting Reminder".to_string());
 
     match email_template.instantiate(&values) {

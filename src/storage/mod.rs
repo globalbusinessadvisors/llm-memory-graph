@@ -1,16 +1,16 @@
 //! Storage backend for persisting graph data
 
-mod sled_backend;
 mod async_sled_backend;
-mod serialization;
 mod cache;
 mod pooled_backend;
+mod serialization;
+mod sled_backend;
 
-pub use sled_backend::SledBackend;
 pub use async_sled_backend::AsyncSledBackend;
-pub use serialization::{Serializer, SerializationFormat};
-pub use cache::{StorageCache, CacheStats};
-pub use pooled_backend::{PooledAsyncBackend, PoolConfig, PoolMetrics, PoolMetricsSnapshot};
+pub use cache::{CacheStats, StorageCache};
+pub use pooled_backend::{PoolConfig, PoolMetrics, PoolMetricsSnapshot, PooledAsyncBackend};
+pub use serialization::{SerializationFormat, Serializer};
+pub use sled_backend::SledBackend;
 
 use crate::error::Result;
 use crate::types::{Edge, EdgeId, Node, NodeId, SessionId};

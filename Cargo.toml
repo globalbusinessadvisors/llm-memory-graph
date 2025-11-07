@@ -6,8 +6,26 @@ authors = ["LLM DevOps Contributors"]
 description = "Graph-based context-tracking and prompt-lineage database for LLM systems"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/globalbusinessadvisors/llm-memory-graph"
-keywords = ["llm", "graph", "memory", "context", "devops"]
-categories = ["database", "development-tools"]
+homepage = "https://github.com/globalbusinessadvisors/llm-memory-graph"
+documentation = "https://docs.rs/llm-memory-graph"
+readme = "README.md"
+keywords = ["llm", "graph", "memory", "context", "ai"]
+categories = ["database-implementations", "development-tools"]
+exclude = [
+    "data/",
+    "deploy/",
+    "docs/",
+    "grafana/",
+    "plans/",
+    "scripts/",
+    ".github/",
+    "node_modules/",
+    "package.json",
+    "package-lock.json",
+    "plugins/",
+    "*.disabled",
+    ".claude-flow/",
+]
 
 [dependencies]
 # Core serialization

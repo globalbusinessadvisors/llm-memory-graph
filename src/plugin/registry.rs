@@ -155,10 +155,7 @@ impl PluginRegistry {
 
     /// List loaded plugins
     pub fn list_loaded(&self) -> Vec<&PluginRegistryEntry> {
-        self.entries
-            .values()
-            .filter(|entry| entry.loaded)
-            .collect()
+        self.entries.values().filter(|entry| entry.loaded).collect()
     }
 
     /// List unloaded plugins
@@ -173,7 +170,12 @@ impl PluginRegistry {
     pub fn find_by_capability(&self, capability: &str) -> Vec<&PluginRegistryEntry> {
         self.entries
             .values()
-            .filter(|entry| entry.metadata.capabilities.contains(&capability.to_string()))
+            .filter(|entry| {
+                entry
+                    .metadata
+                    .capabilities
+                    .contains(&capability.to_string())
+            })
             .collect()
     }
 
@@ -341,10 +343,7 @@ impl PluginDiscovery {
     /// Load plugin metadata from a file
     ///
     /// Placeholder for loading plugin metadata from JSON or TOML files.
-    pub fn load_metadata_from_file(
-        &self,
-        _path: &Path,
-    ) -> Result<PluginMetadata, PluginError> {
+    pub fn load_metadata_from_file(&self, _path: &Path) -> Result<PluginMetadata, PluginError> {
         // TODO: Implement metadata file parsing
         Err(PluginError::General(
             "Metadata file loading not yet implemented".to_string(),
@@ -383,7 +382,12 @@ impl PluginCatalog {
         let entries = self
             .entries
             .into_iter()
-            .filter(|entry| entry.metadata.capabilities.contains(&capability.to_string()))
+            .filter(|entry| {
+                entry
+                    .metadata
+                    .capabilities
+                    .contains(&capability.to_string())
+            })
             .collect();
 
         Self { entries }

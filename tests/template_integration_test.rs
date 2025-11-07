@@ -159,15 +159,13 @@ fn test_template_validation() {
     let config = Config::new(dir.path());
     let graph = MemoryGraph::open(config).unwrap();
 
-    let variables = vec![
-        VariableSpec::new(
-            "email".to_string(),
-            "String".to_string(),
-            true,
-            "Email address".to_string(),
-        )
-        .with_validation(r"^[\w\.-]+@[\w\.-]+\.\w+$".to_string()),
-    ];
+    let variables = vec![VariableSpec::new(
+        "email".to_string(),
+        "String".to_string(),
+        true,
+        "Email address".to_string(),
+    )
+    .with_validation(r"^[\w\.-]+@[\w\.-]+\.\w+$".to_string())];
 
     let template = PromptTemplate::new(
         "Email Template".to_string(),

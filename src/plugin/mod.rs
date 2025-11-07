@@ -292,7 +292,11 @@ pub trait Plugin: Send + Sync {
     /// Generic hook execution (before)
     ///
     /// Routes to the appropriate before hook based on the hook name.
-    async fn before_hook(&self, hook_name: &str, context: &PluginContext) -> Result<(), PluginError> {
+    async fn before_hook(
+        &self,
+        hook_name: &str,
+        context: &PluginContext,
+    ) -> Result<(), PluginError> {
         match hook_name {
             "before_create_node" => self.before_create_node(context).await,
             "before_create_session" => self.before_create_session(context).await,
@@ -305,7 +309,11 @@ pub trait Plugin: Send + Sync {
     /// Generic hook execution (after)
     ///
     /// Routes to the appropriate after hook based on the hook name.
-    async fn after_hook(&self, hook_name: &str, context: &PluginContext) -> Result<(), PluginError> {
+    async fn after_hook(
+        &self,
+        hook_name: &str,
+        context: &PluginContext,
+    ) -> Result<(), PluginError> {
         match hook_name {
             "after_create_node" => self.after_create_node(context).await,
             "after_create_session" => self.after_create_session(context).await,
@@ -413,6 +421,9 @@ mod tests {
             .with_metadata("test_key", "test_value");
 
         assert_eq!(context.operation(), "test_operation");
-        assert_eq!(context.get_metadata("test_key"), Some(&"test_value".to_string()));
+        assert_eq!(
+            context.get_metadata("test_key"),
+            Some(&"test_value".to_string())
+        );
     }
 }

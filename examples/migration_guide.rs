@@ -276,7 +276,10 @@ async fn migration_checklist() -> Result<(), Box<dyn std::error::Error>> {
     // Check 4: Create backup checkpoint
     print!("□ Creating backup checkpoint... ");
     let checkpoint = MigrationHelper::create_checkpoint(&config).await?;
-    println!("✓ ({} nodes, {} edges)", checkpoint.node_count, checkpoint.edge_count);
+    println!(
+        "✓ ({} nodes, {} edges)",
+        checkpoint.node_count, checkpoint.edge_count
+    );
 
     // Check 5: Test migration
     print!("□ Running migration test... ");

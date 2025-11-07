@@ -254,7 +254,9 @@ impl PrometheusMetrics {
                 "memory_graph_batch_size",
                 "Batch operation size distribution",
             )
-            .buckets(vec![1.0, 5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0]),
+            .buckets(vec![
+                1.0, 5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0,
+            ]),
         )?;
         registry.register(Box::new(batch_size.clone()))?;
 
@@ -924,14 +926,14 @@ mod tests {
         let metrics = PrometheusMetrics::new(&registry).unwrap();
 
         // Test various latency ranges
-        metrics.record_write_latency(0.001);  // 1ms
-        metrics.record_write_latency(0.010);  // 10ms
-        metrics.record_write_latency(0.100);  // 100ms
-        metrics.record_write_latency(1.000);  // 1s
+        metrics.record_write_latency(0.001); // 1ms
+        metrics.record_write_latency(0.010); // 10ms
+        metrics.record_write_latency(0.100); // 100ms
+        metrics.record_write_latency(1.000); // 1s
 
         metrics.record_read_latency(0.0001); // 0.1ms
-        metrics.record_read_latency(0.001);  // 1ms
-        metrics.record_read_latency(0.01);   // 10ms
+        metrics.record_read_latency(0.001); // 1ms
+        metrics.record_read_latency(0.01); // 10ms
     }
 
     #[test]

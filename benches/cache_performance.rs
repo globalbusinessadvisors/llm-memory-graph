@@ -2,7 +2,7 @@
 //!
 //! Run with: cargo bench cache_performance
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use llm_memory_graph::{
     engine::AsyncMemoryGraph,
     types::{Config, TokenUsage},
@@ -137,10 +137,7 @@ fn bench_write_operations(c: &mut Criterion) {
                 let (graph, prompt_id) = runtime.block_on(async {
                     let g = AsyncMemoryGraph::open(config).await.unwrap();
                     let s = g.create_session().await.unwrap();
-                    let p = g
-                        .add_prompt(s.id, "Test".to_string(), None)
-                        .await
-                        .unwrap();
+                    let p = g.add_prompt(s.id, "Test".to_string(), None).await.unwrap();
                     (g, p)
                 });
                 (graph, prompt_id)

@@ -49,10 +49,7 @@ pub struct InstantiatesProperties {
 
 impl InstantiatesProperties {
     /// Create new instantiation properties
-    pub fn new(
-        template_version: String,
-        variable_bindings: HashMap<String, String>,
-    ) -> Self {
+    pub fn new(template_version: String, variable_bindings: HashMap<String, String>) -> Self {
         Self {
             template_version,
             variable_bindings,
@@ -63,7 +60,10 @@ impl InstantiatesProperties {
     /// Convert to property map for storage
     pub fn to_properties(&self) -> HashMap<String, String> {
         let mut props = HashMap::new();
-        props.insert("template_version".to_string(), self.template_version.clone());
+        props.insert(
+            "template_version".to_string(),
+            self.template_version.clone(),
+        );
         props.insert(
             "variable_bindings".to_string(),
             serde_json::to_string(&self.variable_bindings).unwrap_or_default(),
@@ -384,11 +384,7 @@ pub struct ReferencesProperties {
 
 impl ReferencesProperties {
     /// Create new reference properties
-    pub fn new(
-        context_type: ContextType,
-        relevance_score: f32,
-        chunk_id: Option<String>,
-    ) -> Self {
+    pub fn new(context_type: ContextType, relevance_score: f32, chunk_id: Option<String>) -> Self {
         // Clamp relevance score between 0.0 and 1.0
         let relevance_score = relevance_score.max(0.0).min(1.0);
 
@@ -518,17 +514,8 @@ impl Edge {
     /// let edge = Edge::instantiates(prompt_id, template_id, properties);
     /// ```
     #[must_use]
-    pub fn instantiates(
-        from: NodeId,
-        to: NodeId,
-        properties: InstantiatesProperties,
-    ) -> Self {
-        Self::with_properties(
-            from,
-            to,
-            EdgeType::Instantiates,
-            properties.to_properties(),
-        )
+    pub fn instantiates(from: NodeId, to: NodeId, properties: InstantiatesProperties) -> Self {
+        Self::with_properties(from, to, EdgeType::Instantiates, properties.to_properties())
     }
 
     /// Create an INHERITS edge with typed properties
@@ -551,17 +538,8 @@ impl Edge {
     /// let edge = Edge::inherits(child_id, parent_id, properties);
     /// ```
     #[must_use]
-    pub fn inherits(
-        from: NodeId,
-        to: NodeId,
-        properties: InheritsProperties,
-    ) -> Self {
-        Self::with_properties(
-            from,
-            to,
-            EdgeType::Inherits,
-            properties.to_properties(),
-        )
+    pub fn inherits(from: NodeId, to: NodeId, properties: InheritsProperties) -> Self {
+        Self::with_properties(from, to, EdgeType::Inherits, properties.to_properties())
     }
 
     /// Create an INVOKES edge with typed properties
@@ -580,17 +558,8 @@ impl Edge {
     /// let edge = Edge::invokes(response_id, tool_id, properties);
     /// ```
     #[must_use]
-    pub fn invokes(
-        from: NodeId,
-        to: NodeId,
-        properties: InvokesProperties,
-    ) -> Self {
-        Self::with_properties(
-            from,
-            to,
-            EdgeType::Invokes,
-            properties.to_properties(),
-        )
+    pub fn invokes(from: NodeId, to: NodeId, properties: InvokesProperties) -> Self {
+        Self::with_properties(from, to, EdgeType::Invokes, properties.to_properties())
     }
 
     /// Create a TRANSFERS_TO edge with typed properties
@@ -613,17 +582,8 @@ impl Edge {
     /// let edge = Edge::transfers_to(response_id, agent_id, properties);
     /// ```
     #[must_use]
-    pub fn transfers_to(
-        from: NodeId,
-        to: NodeId,
-        properties: TransfersToProperties,
-    ) -> Self {
-        Self::with_properties(
-            from,
-            to,
-            EdgeType::TransfersTo,
-            properties.to_properties(),
-        )
+    pub fn transfers_to(from: NodeId, to: NodeId, properties: TransfersToProperties) -> Self {
+        Self::with_properties(from, to, EdgeType::TransfersTo, properties.to_properties())
     }
 
     /// Create a REFERENCES edge with typed properties
@@ -646,17 +606,8 @@ impl Edge {
     /// let edge = Edge::references(prompt_id, context_id, properties);
     /// ```
     #[must_use]
-    pub fn references(
-        from: NodeId,
-        to: NodeId,
-        properties: ReferencesProperties,
-    ) -> Self {
-        Self::with_properties(
-            from,
-            to,
-            EdgeType::References,
-            properties.to_properties(),
-        )
+    pub fn references(from: NodeId, to: NodeId, properties: ReferencesProperties) -> Self {
+        Self::with_properties(from, to, EdgeType::References, properties.to_properties())
     }
 
     // ===== Property Extraction Methods =====
@@ -762,7 +713,10 @@ mod tests {
         edge.add_property("required".to_string(), "false".to_string());
 
         assert_eq!(edge.edge_type, EdgeType::Invokes);
-        assert_eq!(edge.get_property("invocation_order"), Some(&"1".to_string()));
+        assert_eq!(
+            edge.get_property("invocation_order"),
+            Some(&"1".to_string())
+        );
         assert_eq!(edge.get_property("success"), Some(&"true".to_string()));
     }
 
@@ -778,7 +732,10 @@ mod tests {
 
         assert_eq!(props.template_version, "1.2.3");
         assert_eq!(props.variable_bindings.len(), 2);
-        assert_eq!(props.variable_bindings.get("name"), Some(&"Alice".to_string()));
+        assert_eq!(
+            props.variable_bindings.get("name"),
+            Some(&"Alice".to_string())
+        );
     }
 
     #[test]
@@ -804,7 +761,10 @@ mod tests {
         let restored = InstantiatesProperties::from_properties(&map).unwrap();
 
         assert_eq!(restored.template_version, "1.0.0");
-        assert_eq!(restored.variable_bindings.get("key"), Some(&"value".to_string()));
+        assert_eq!(
+            restored.variable_bindings.get("key"),
+            Some(&"value".to_string())
+        );
     }
 
     #[test]
@@ -830,11 +790,8 @@ mod tests {
     #[test]
     fn test_inherits_properties_creation() {
         let sections = vec!["variables".to_string(), "description".to_string()];
-        let props = InheritsProperties::new(
-            sections.clone(),
-            "Added validation rules".to_string(),
-            2,
-        );
+        let props =
+            InheritsProperties::new(sections.clone(), "Added validation rules".to_string(), 2);
 
         assert_eq!(props.override_sections.len(), 2);
         assert_eq!(props.version_diff, "Added validation rules");
@@ -861,11 +818,8 @@ mod tests {
         let child_id = NodeId::new();
         let parent_id = NodeId::new();
 
-        let props = InheritsProperties::new(
-            vec!["all".to_string()],
-            "Complete rewrite".to_string(),
-            1,
-        );
+        let props =
+            InheritsProperties::new(vec!["all".to_string()], "Complete rewrite".to_string(), 1);
         let edge = Edge::inherits(child_id, parent_id, props);
 
         assert_eq!(edge.edge_type, EdgeType::Inherits);
@@ -998,12 +952,30 @@ mod tests {
 
     #[test]
     fn test_context_type_from_str() {
-        assert_eq!("document".parse::<ContextType>().unwrap(), ContextType::Document);
-        assert_eq!("webpage".parse::<ContextType>().unwrap(), ContextType::WebPage);
-        assert_eq!("database".parse::<ContextType>().unwrap(), ContextType::Database);
-        assert_eq!("vector_search".parse::<ContextType>().unwrap(), ContextType::VectorSearch);
-        assert_eq!("memory".parse::<ContextType>().unwrap(), ContextType::Memory);
-        assert_eq!("DOCUMENT".parse::<ContextType>().unwrap(), ContextType::Document);
+        assert_eq!(
+            "document".parse::<ContextType>().unwrap(),
+            ContextType::Document
+        );
+        assert_eq!(
+            "webpage".parse::<ContextType>().unwrap(),
+            ContextType::WebPage
+        );
+        assert_eq!(
+            "database".parse::<ContextType>().unwrap(),
+            ContextType::Database
+        );
+        assert_eq!(
+            "vector_search".parse::<ContextType>().unwrap(),
+            ContextType::VectorSearch
+        );
+        assert_eq!(
+            "memory".parse::<ContextType>().unwrap(),
+            ContextType::Memory
+        );
+        assert_eq!(
+            "DOCUMENT".parse::<ContextType>().unwrap(),
+            ContextType::Document
+        );
         assert!("invalid".parse::<ContextType>().is_err());
     }
 
@@ -1011,11 +983,8 @@ mod tests {
 
     #[test]
     fn test_references_properties_creation() {
-        let props = ReferencesProperties::new(
-            ContextType::Document,
-            0.95,
-            Some("chunk_42".to_string()),
-        );
+        let props =
+            ReferencesProperties::new(ContextType::Document, 0.95, Some("chunk_42".to_string()));
 
         assert_eq!(props.context_type, ContextType::Document);
         assert_eq!(props.relevance_score, 0.95);
@@ -1039,11 +1008,8 @@ mod tests {
 
     #[test]
     fn test_references_properties_round_trip() {
-        let props = ReferencesProperties::new(
-            ContextType::VectorSearch,
-            0.88,
-            Some("doc_123".to_string()),
-        );
+        let props =
+            ReferencesProperties::new(ContextType::VectorSearch, 0.88, Some("doc_123".to_string()));
         let map = props.to_properties();
         let restored = ReferencesProperties::from_properties(&map).unwrap();
 
@@ -1057,11 +1023,8 @@ mod tests {
         let prompt_id = NodeId::new();
         let context_id = NodeId::new();
 
-        let props = ReferencesProperties::new(
-            ContextType::Document,
-            0.92,
-            Some("section_5".to_string()),
-        );
+        let props =
+            ReferencesProperties::new(ContextType::Document, 0.92, Some("section_5".to_string()));
         let edge = Edge::references(prompt_id, context_id, props);
 
         assert_eq!(edge.edge_type, EdgeType::References);

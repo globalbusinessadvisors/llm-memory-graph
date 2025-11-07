@@ -3,9 +3,7 @@
 //! These tests verify the full workflow of tool invocations with LLM responses,
 //! including creation, updates, querying, and edge relationships.
 
-use llm_memory_graph::{
-    MemoryGraph, Config, TokenUsage, ResponseMetadata, ToolInvocation,
-};
+use llm_memory_graph::{Config, MemoryGraph, ResponseMetadata, TokenUsage, ToolInvocation};
 use std::collections::HashMap;
 use tempfile::tempdir;
 
@@ -150,12 +148,7 @@ fn test_multiple_tool_invocations() {
 
     // Update news tool - failure
     graph
-        .update_tool_invocation(
-            news_id,
-            false,
-            "API rate limit exceeded".to_string(),
-            100,
-        )
+        .update_tool_invocation(news_id, false, "API rate limit exceeded".to_string(), 100)
         .unwrap();
 
     // Retrieve all tools for the response
@@ -340,11 +333,7 @@ fn test_tool_invocation_status_transitions() {
         .add_response(prompt_id, "Test".to_string(), usage, None)
         .unwrap();
 
-    let mut tool = ToolInvocation::new(
-        response_id,
-        "test_tool".to_string(),
-        serde_json::json!({}),
-    );
+    let mut tool = ToolInvocation::new(response_id, "test_tool".to_string(), serde_json::json!({}));
 
     // Initially pending
     assert_eq!(tool.status(), "pending");
@@ -381,9 +370,6 @@ fn test_tool_invocation_status_transitions() {
     let failed_tool = tools.iter().find(|t| t.tool_name == "test_tool").unwrap();
     assert!(failed_tool.is_failed());
 
-    let success_tool = tools
-        .iter()
-        .find(|t| t.tool_name == "test_tool_2")
-        .unwrap();
+    let success_tool = tools.iter().find(|t| t.tool_name == "test_tool_2").unwrap();
     assert!(success_tool.is_success());
 }

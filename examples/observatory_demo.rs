@@ -35,8 +35,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Create graph with Observatory
     let config = Config::new("./data/observatory_demo.db");
-    let graph = AsyncMemoryGraph::with_observatory(config, Some(publisher.clone()), obs_config)
-        .await?;
+    let graph =
+        AsyncMemoryGraph::with_observatory(config, Some(publisher.clone()), obs_config).await?;
 
     println!("Created AsyncMemoryGraph with Observatory integration\n");
 
@@ -144,10 +144,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("--- Example 6: Filtering Events ---");
 
     let prompt_events = publisher.get_events_by_type("prompt_submitted").await;
-    println!(
-        "Found {} prompt submission events",
-        prompt_events.len()
-    );
+    println!("Found {} prompt submission events", prompt_events.len());
 
     if let Some(first_prompt) = prompt_events.first() {
         println!("First prompt event timestamp: {}", first_prompt.timestamp());
@@ -161,7 +158,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Add some operations
         for _ in 0..10 {
             graph
-                .add_prompt(session.id, format!("Monitoring iteration {}", iteration), None)
+                .add_prompt(
+                    session.id,
+                    format!("Monitoring iteration {}", iteration),
+                    None,
+                )
                 .await?;
         }
 
@@ -185,7 +186,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("\nFinal metrics:");
         println!("  Nodes created: {}", final_metrics.nodes_created);
         println!("  Prompts submitted: {}", final_metrics.prompts_submitted);
-        println!("  Responses generated: {}", final_metrics.responses_generated);
+        println!(
+            "  Responses generated: {}",
+            final_metrics.responses_generated
+        );
         println!(
             "  Average write latency: {:.3}ms",
             final_metrics.avg_write_latency_ms

@@ -32,11 +32,7 @@
 //! cargo run --bin server
 //! ```
 
-use llm_memory_graph::{
-    engine::AsyncMemoryGraph,
-    observatory::PrometheusMetrics,
-    types::Config,
-};
+use llm_memory_graph::{engine::AsyncMemoryGraph, observatory::PrometheusMetrics, types::Config};
 use prometheus::Registry;
 use std::sync::Arc;
 use std::time::Instant;
@@ -128,11 +124,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             tracing_subscriber::fmt::layer()
                 .with_target(true)
                 .with_thread_ids(true)
-                .with_line_number(true)
+                .with_line_number(true),
         )
         .init();
 
-    info!("Starting LLM-Memory-Graph gRPC Server v{}", env!("CARGO_PKG_VERSION"));
+    info!(
+        "Starting LLM-Memory-Graph gRPC Server v{}",
+        env!("CARGO_PKG_VERSION")
+    );
 
     // Load and validate configuration
     let config = ServerConfig::from_env();
@@ -158,7 +157,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let registry = Registry::new();
     let metrics = Arc::new(
         PrometheusMetrics::new(&registry)
-            .map_err(|e| format!("Failed to create Prometheus metrics: {}", e))?
+            .map_err(|e| format!("Failed to create Prometheus metrics: {}", e))?,
     );
     info!("Prometheus metrics initialized with 18 metrics");
 
@@ -168,7 +167,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let graph = Arc::new(
         AsyncMemoryGraph::open(graph_config)
             .await
-            .map_err(|e| format!("Failed to open memory graph: {}", e))?
+            .map_err(|e| format!("Failed to open memory graph: {}", e))?,
     );
     info!("Memory graph database opened successfully");
 
@@ -192,7 +191,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize plugin manager (future extension)
     // Note: Plugin system would be initialized here when implemented
     if let Some(ref plugin_dirs) = config.plugin_dirs {
-        info!("Plugin system not yet implemented, ignoring PLUGIN_DIRS: {}", plugin_dirs);
+        info!(
+            "Plugin system not yet implemented, ignoring PLUGIN_DIRS: {}",
+            plugin_dirs
+        );
     }
 
     // Initialize integrations (future extension)
@@ -212,7 +214,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    info!("Metrics server started on http://0.0.0.0:{}/metrics", config.metrics_port);
+    info!(
+        "Metrics server started on http://0.0.0.0:{}/metrics",
+        config.metrics_port
+    );
 
     // Note: gRPC service implementation would go here
     // For now, we create a placeholder that demonstrates the structure
@@ -271,44 +276,39 @@ async fn serve_metrics(
     use warp::Filter;
 
     // Health check endpoint
-    let health = warp::path("health")
-        .map(|| warp::reply::json(&serde_json::json!({
+    let health = warp::path("health").map(|| {
+        warp::reply::json(&serde_json::json!({
             "status": "healthy",
             "service": "llm-memory-graph",
             "version": env!("CARGO_PKG_VERSION")
-        })));
+        }))
+    });
 
     // Metrics endpoint
-    let metrics = warp::path("metrics")
-        .map(move || {
-            use prometheus::Encoder;
-            let encoder = prometheus::TextEncoder::new();
-            let metric_families = registry.gather();
-            let mut buffer = vec![];
+    let metrics = warp::path("metrics").map(move || {
+        use prometheus::Encoder;
+        let encoder = prometheus::TextEncoder::new();
+        let metric_families = registry.gather();
+        let mut buffer = vec![];
 
-            match encoder.encode(&metric_families, &mut buffer) {
-                Ok(()) => {
-                    match String::from_utf8(buffer) {
-                        Ok(text) => warp::reply::with_status(
-                            text,
-                            warp::http::StatusCode::OK
-                        ),
-                        Err(_) => warp::reply::with_status(
-                            "Error encoding metrics".to_string(),
-                            warp::http::StatusCode::INTERNAL_SERVER_ERROR
-                        ),
-                    }
-                }
+        match encoder.encode(&metric_families, &mut buffer) {
+            Ok(()) => match String::from_utf8(buffer) {
+                Ok(text) => warp::reply::with_status(text, warp::http::StatusCode::OK),
                 Err(_) => warp::reply::with_status(
-                    "Error gathering metrics".to_string(),
-                    warp::http::StatusCode::INTERNAL_SERVER_ERROR
+                    "Error encoding metrics".to_string(),
+                    warp::http::StatusCode::INTERNAL_SERVER_ERROR,
                 ),
-            }
-        });
+            },
+            Err(_) => warp::reply::with_status(
+                "Error gathering metrics".to_string(),
+                warp::http::StatusCode::INTERNAL_SERVER_ERROR,
+            ),
+        }
+    });
 
     // Root endpoint
-    let root = warp::path::end()
-        .map(|| warp::reply::html(
+    let root = warp::path::end().map(|| {
+        warp::reply::html(
             r#"<!DOCTYPE html>
 <html>
 <head>
@@ -327,12 +327,16 @@ async fn serve_metrics(
     <div class="endpoint"><a href="/metrics">/metrics</a> - Prometheus metrics</div>
     <div class="endpoint"><a href="/health">/health</a> - Health check</div>
 </body>
-</html>"#
-        ));
+</html>"#,
+        )
+    });
 
     let routes = root.or(health).or(metrics);
 
-    info!("Metrics server listening on http://{}:{}", addr.0[0], addr.1);
+    info!(
+        "Metrics server listening on http://{}:{}",
+        addr.0[0], addr.1
+    );
     warp::serve(routes).run(addr).await;
 
     Ok(())

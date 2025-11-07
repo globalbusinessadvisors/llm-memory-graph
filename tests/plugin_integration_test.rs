@@ -3,14 +3,14 @@
 //! Tests plugin registration, lifecycle management, hook execution,
 //! and interaction with the core memory graph functionality.
 
-use llm_memory_graph::plugin::{
-    Plugin, PluginBuilder, PluginContext, PluginError, PluginManager, PluginMetadata, PluginRegistry,
-    HookExecutor, HookPoint,
-};
 use async_trait::async_trait;
+use llm_memory_graph::plugin::{
+    HookExecutor, HookPoint, Plugin, PluginBuilder, PluginContext, PluginError, PluginManager,
+    PluginMetadata, PluginRegistry,
+};
 use serde_json::json;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 use tokio::sync::RwLock;
 
 // Test plugin that tracks hook calls
@@ -51,7 +51,8 @@ impl Plugin for CountingPlugin {
     }
 
     async fn before_create_node(&self, _context: &PluginContext) -> Result<(), PluginError> {
-        self.before_create_node_count.fetch_add(1, Ordering::Relaxed);
+        self.before_create_node_count
+            .fetch_add(1, Ordering::Relaxed);
         Ok(())
     }
 
@@ -82,7 +83,8 @@ impl FailingPlugin {
     }
 
     fn set_fail(&self, should_fail: bool) {
-        self.should_fail.store(should_fail as usize, Ordering::Relaxed);
+        self.should_fail
+            .store(should_fail as usize, Ordering::Relaxed);
     }
 }
 

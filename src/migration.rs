@@ -216,7 +216,9 @@ impl MigrationHelper {
 
         // Step 1: Create checkpoint
         match Self::create_checkpoint(config).await {
-            Ok(_) => report.steps_completed.push("Checkpoint created".to_string()),
+            Ok(_) => report
+                .steps_completed
+                .push("Checkpoint created".to_string()),
             Err(e) => {
                 report
                     .errors
@@ -227,22 +229,22 @@ impl MigrationHelper {
 
         // Step 2: Test sync API
         match MemoryGraph::open(config.clone()) {
-            Ok(_) => report.steps_completed.push("Sync API accessible".to_string()),
+            Ok(_) => report
+                .steps_completed
+                .push("Sync API accessible".to_string()),
             Err(e) => {
-                report
-                    .errors
-                    .push(format!("Sync API failed: {}", e));
+                report.errors.push(format!("Sync API failed: {}", e));
                 return Ok(report);
             }
         }
 
         // Step 3: Test async API
         match AsyncMemoryGraph::open(config.clone()).await {
-            Ok(_) => report.steps_completed.push("Async API accessible".to_string()),
+            Ok(_) => report
+                .steps_completed
+                .push("Async API accessible".to_string()),
             Err(e) => {
-                report
-                    .errors
-                    .push(format!("Async API failed: {}", e));
+                report.errors.push(format!("Async API failed: {}", e));
                 return Ok(report);
             }
         }
@@ -253,9 +255,7 @@ impl MigrationHelper {
                 report.steps_completed.push("APIs compatible".to_string())
             }
             Ok(_) => {
-                report
-                    .errors
-                    .push("APIs not compatible".to_string());
+                report.errors.push("APIs not compatible".to_string());
                 return Ok(report);
             }
             Err(e) => {
@@ -341,7 +341,9 @@ mod tests {
         let dir = tempdir().unwrap();
         let config = Config::new(dir.path());
 
-        let report = MigrationHelper::verify_compatibility(&config).await.unwrap();
+        let report = MigrationHelper::verify_compatibility(&config)
+            .await
+            .unwrap();
 
         assert!(report.sync_accessible);
         assert!(report.async_accessible);
@@ -361,7 +363,9 @@ mod tests {
             graph.create_session().unwrap();
         }
 
-        let report = MigrationHelper::verify_compatibility(&config).await.unwrap();
+        let report = MigrationHelper::verify_compatibility(&config)
+            .await
+            .unwrap();
 
         assert!(report.sync_accessible);
         assert!(report.async_accessible);
@@ -430,7 +434,10 @@ mod tests {
 
         assert!(report.success, "Migration test should succeed");
         assert!(report.errors.is_empty(), "Should have no errors");
-        assert!(report.steps_completed.len() >= 4, "Should complete all steps");
+        assert!(
+            report.steps_completed.len() >= 4,
+            "Should complete all steps"
+        );
     }
 
     #[tokio::test]

@@ -352,8 +352,8 @@ pub mod retry {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::retry::RetryConfig;
+    use super::*;
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::Arc;
 

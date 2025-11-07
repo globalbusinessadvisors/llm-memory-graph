@@ -557,8 +557,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_producer_retry_on_failure() {
-        let config = KafkaConfig::default()
-            .with_retry_config(3, 10);
+        let config = KafkaConfig::default().with_retry_config(3, 10);
         let mock = MockKafkaProducer::new(config.clone());
 
         // Set high failure rate initially

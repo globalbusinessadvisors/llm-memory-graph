@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build_client(true) // Generate client code for testing
         .compile(
             &["proto/memory_graph.proto"], // Proto files to compile
-            &["proto"],                     // Include directories
+            &["proto"],                    // Include directories
         )?;
 
     // Re-run build script if proto files change

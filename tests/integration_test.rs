@@ -23,10 +23,7 @@ fn test_full_conversation_workflow() {
     metadata.insert("app".to_string(), "chatbot".to_string());
     let session = graph.create_session_with_metadata(metadata).unwrap();
 
-    assert_eq!(
-        session.metadata.get("user"),
-        Some(&"alice".to_string())
-    );
+    assert_eq!(session.metadata.get("user"), Some(&"alice".to_string()));
 
     // Add first prompt
     let prompt_meta = PromptMetadata {
@@ -287,10 +284,7 @@ fn test_persistence_close_and_reopen() {
 
         // Verify prompt exists
         let node = graph.get_node(prompt_id).unwrap();
-        assert!(matches!(
-            node,
-            llm_memory_graph::types::Node::Prompt(_)
-        ));
+        assert!(matches!(node, llm_memory_graph::types::Node::Prompt(_)));
 
         if let llm_memory_graph::types::Node::Prompt(p) = node {
             assert_eq!(p.content, "Persistent prompt");

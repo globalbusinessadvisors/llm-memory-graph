@@ -8,8 +8,8 @@ use crate::error::{Error, Result};
 use crate::storage::{SledBackend, StorageBackend};
 use crate::types::{
     AgentNode, Config, ConversationSession, Edge, EdgeType, Node, NodeId, PromptMetadata,
-    PromptNode, PromptTemplate, ResponseMetadata, ResponseNode, SessionId, TemplateId,
-    TokenUsage, ToolInvocation,
+    PromptNode, PromptTemplate, ResponseMetadata, ResponseNode, SessionId, TemplateId, TokenUsage,
+    ToolInvocation,
 };
 use parking_lot::RwLock;
 use std::collections::HashMap;
@@ -97,9 +97,7 @@ impl MemoryGraph {
         self.backend.store_node(&Node::Session(session.clone()))?;
 
         // Cache the session
-        self.sessions
-            .write()
-            .insert(session.id, session.clone());
+        self.sessions.write().insert(session.id, session.clone());
 
         Ok(session)
     }
@@ -131,9 +129,7 @@ impl MemoryGraph {
         self.backend.store_node(&Node::Session(session.clone()))?;
 
         // Cache the session
-        self.sessions
-            .write()
-            .insert(session.id, session.clone());
+        self.sessions.write().insert(session.id, session.clone());
 
         Ok(session)
     }
@@ -171,9 +167,7 @@ impl MemoryGraph {
             if let Node::Session(session) = node {
                 if session.id == session_id {
                     // Update cache
-                    self.sessions
-                        .write()
-                        .insert(session_id, session.clone());
+                    self.sessions.write().insert(session_id, session.clone());
                     return Ok(session);
                 }
             }
@@ -228,10 +222,7 @@ impl MemoryGraph {
 
         // Create edge from prompt to session
         let session_nodes = self.backend.get_session_nodes(&session_id)?;
-        if let Some(session_node) = session_nodes
-            .iter()
-            .find(|n| matches!(n, Node::Session(_)))
-        {
+        if let Some(session_node) = session_nodes.iter().find(|n| matches!(n, Node::Session(_))) {
             let edge = Edge::new(prompt_id, session_node.id(), EdgeType::PartOf);
             self.backend.store_edge(&edge)?;
         }
@@ -310,8 +301,7 @@ impl MemoryGraph {
         };
 
         let response_id = response.id;
-        self.backend
-            .store_node(&Node::Response(response.clone()))?;
+        self.backend.store_node(&Node::Response(response.clone()))?;
 
         // Create edge from response to prompt
         let edge = Edge::new(response_id, prompt_id, EdgeType::RespondsTo);
@@ -399,7 +389,9 @@ impl MemoryGraph {
         duration_ms: u64,
     ) -> Result<()> {
         // Get the tool invocation node
-        let node = self.backend.get_node(&tool_id)?
+        let node = self
+            .backend
+            .get_node(&tool_id)?
             .ok_or_else(|| Error::NodeNotFound(tool_id.to_string()))?;
 
         if let Node::ToolInvocation(mut tool) = node {
@@ -909,14 +901,17 @@ impl MemoryGraph {
     /// # }
     /// ```
     pub fn get_template_by_node_id(&self, node_id: NodeId) -> Result<PromptTemplate> {
-        let node = self.backend.get_node(&node_id)?
+        let node = self
+            .backend
+            .get_node(&node_id)?
             .ok_or_else(|| Error::NodeNotFound(format!("Node {} not found", node_id)))?;
 
         match node {
             Node::Template(template) => Ok(template),
-            _ => Err(Error::ValidationError(
-                format!("Node {} is not a template", node_id)
-            )),
+            _ => Err(Error::ValidationError(format!(
+                "Node {} is not a template",
+                node_id
+            ))),
         }
     }
 
@@ -977,7 +972,11 @@ impl MemoryGraph {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn link_prompt_to_template(&self, prompt_id: NodeId, template_node_id: NodeId) -> Result<()> {
+    pub fn link_prompt_to_template(
+        &self,
+        prompt_id: NodeId,
+        template_node_id: NodeId,
+    ) -> Result<()> {
         let edge = Edge::new(prompt_id, template_node_id, EdgeType::Instantiates);
         self.backend.store_edge(&edge)?;
         Ok(())
@@ -1165,9 +1164,6 @@ mod tests {
         let session = graph.create_session_with_metadata(metadata).unwrap();
         let retrieved = graph.get_session(session.id).unwrap();
 
-        assert_eq!(
-            retrieved.metadata.get("user"),
-            Some(&"alice".to_string())
-        );
+        assert_eq!(retrieved.metadata.get("user"), Some(&"alice".to_string()));
     }
 }

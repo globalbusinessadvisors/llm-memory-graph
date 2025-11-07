@@ -39,11 +39,9 @@ impl AsyncSledBackend {
         let path_buf = path.as_ref().to_path_buf();
 
         // Run the synchronous open operation in a blocking task
-        let inner = tokio::task::spawn_blocking(move || {
-            SledBackend::open(path_buf)
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))??;
+        let inner = tokio::task::spawn_blocking(move || SledBackend::open(path_buf))
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))??;
 
         Ok(Self {
             inner: Arc::new(inner),
@@ -72,11 +70,10 @@ impl AsyncSledBackend {
     ) -> Result<Self> {
         let path_buf = path.as_ref().to_path_buf();
 
-        let inner = tokio::task::spawn_blocking(move || {
-            SledBackend::open_with_format(path_buf, format)
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))??;
+        let inner =
+            tokio::task::spawn_blocking(move || SledBackend::open_with_format(path_buf, format))
+                .await
+                .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))??;
 
         Ok(Self {
             inner: Arc::new(inner),
@@ -90,119 +87,97 @@ impl AsyncStorageBackend for AsyncSledBackend {
         let inner = Arc::clone(&self.inner);
         let node = node.clone();
 
-        tokio::task::spawn_blocking(move || {
-            inner.store_node(&node)
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
+        tokio::task::spawn_blocking(move || inner.store_node(&node))
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
     }
 
     async fn get_node(&self, id: &NodeId) -> Result<Option<Node>> {
         let inner = Arc::clone(&self.inner);
         let id = *id;
 
-        tokio::task::spawn_blocking(move || {
-            inner.get_node(&id)
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
+        tokio::task::spawn_blocking(move || inner.get_node(&id))
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
     }
 
     async fn delete_node(&self, id: &NodeId) -> Result<()> {
         let inner = Arc::clone(&self.inner);
         let id = *id;
 
-        tokio::task::spawn_blocking(move || {
-            inner.delete_node(&id)
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
+        tokio::task::spawn_blocking(move || inner.delete_node(&id))
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
     }
 
     async fn store_edge(&self, edge: &Edge) -> Result<()> {
         let inner = Arc::clone(&self.inner);
         let edge = edge.clone();
 
-        tokio::task::spawn_blocking(move || {
-            inner.store_edge(&edge)
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
+        tokio::task::spawn_blocking(move || inner.store_edge(&edge))
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
     }
 
     async fn get_edge(&self, id: &EdgeId) -> Result<Option<Edge>> {
         let inner = Arc::clone(&self.inner);
         let id = *id;
 
-        tokio::task::spawn_blocking(move || {
-            inner.get_edge(&id)
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
+        tokio::task::spawn_blocking(move || inner.get_edge(&id))
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
     }
 
     async fn delete_edge(&self, id: &EdgeId) -> Result<()> {
         let inner = Arc::clone(&self.inner);
         let id = *id;
 
-        tokio::task::spawn_blocking(move || {
-            inner.delete_edge(&id)
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
+        tokio::task::spawn_blocking(move || inner.delete_edge(&id))
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
     }
 
     async fn get_session_nodes(&self, session_id: &SessionId) -> Result<Vec<Node>> {
         let inner = Arc::clone(&self.inner);
         let session_id = *session_id;
 
-        tokio::task::spawn_blocking(move || {
-            inner.get_session_nodes(&session_id)
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
+        tokio::task::spawn_blocking(move || inner.get_session_nodes(&session_id))
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
     }
 
     async fn get_outgoing_edges(&self, node_id: &NodeId) -> Result<Vec<Edge>> {
         let inner = Arc::clone(&self.inner);
         let node_id = *node_id;
 
-        tokio::task::spawn_blocking(move || {
-            inner.get_outgoing_edges(&node_id)
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
+        tokio::task::spawn_blocking(move || inner.get_outgoing_edges(&node_id))
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
     }
 
     async fn get_incoming_edges(&self, node_id: &NodeId) -> Result<Vec<Edge>> {
         let inner = Arc::clone(&self.inner);
         let node_id = *node_id;
 
-        tokio::task::spawn_blocking(move || {
-            inner.get_incoming_edges(&node_id)
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
+        tokio::task::spawn_blocking(move || inner.get_incoming_edges(&node_id))
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
     }
 
     async fn flush(&self) -> Result<()> {
         let inner = Arc::clone(&self.inner);
 
-        tokio::task::spawn_blocking(move || {
-            inner.flush()
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
+        tokio::task::spawn_blocking(move || inner.flush())
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
     }
 
     async fn stats(&self) -> Result<StorageStats> {
         let inner = Arc::clone(&self.inner);
 
-        tokio::task::spawn_blocking(move || {
-            inner.stats()
-        })
-        .await
-        .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
+        tokio::task::spawn_blocking(move || inner.stats())
+            .await
+            .map_err(|e| crate::error::Error::RuntimeError(e.to_string()))?
     }
 
     async fn store_nodes_batch(&self, nodes: &[Node]) -> Result<Vec<NodeId>> {
@@ -271,7 +246,8 @@ impl AsyncStorageBackend for AsyncSledBackend {
         let session_id = *session_id;
 
         tokio::task::spawn_blocking(move || {
-            inner.get_session_nodes(&session_id)
+            inner
+                .get_session_nodes(&session_id)
                 .map(|nodes| nodes.len())
         })
         .await
@@ -302,7 +278,10 @@ mod tests {
 
         // Create and store a session
         let session = ConversationSession::new();
-        backend.store_node(&Node::Session(session.clone())).await.unwrap();
+        backend
+            .store_node(&Node::Session(session.clone()))
+            .await
+            .unwrap();
 
         // Retrieve it
         let retrieved = backend.get_node(&session.node_id).await.unwrap();
@@ -319,7 +298,10 @@ mod tests {
         let backend = AsyncSledBackend::open(dir.path()).await.unwrap();
 
         let session = ConversationSession::new();
-        backend.store_node(&Node::Session(session.clone())).await.unwrap();
+        backend
+            .store_node(&Node::Session(session.clone()))
+            .await
+            .unwrap();
 
         // Perform 100 concurrent write operations
         let mut handles = vec![];
@@ -328,10 +310,7 @@ mod tests {
             let session_id = session.id;
 
             let handle = tokio::spawn(async move {
-                let prompt = PromptNode::new(
-                    session_id,
-                    format!("Prompt {}", i),
-                );
+                let prompt = PromptNode::new(session_id, format!("Prompt {}", i));
                 backend_clone.store_node(&Node::Prompt(prompt)).await
             });
 
@@ -358,10 +337,7 @@ mod tests {
         // Create multiple nodes
         let mut nodes = vec![Node::Session(session.clone())];
         for i in 0..10 {
-            let prompt = PromptNode::new(
-                session.id,
-                format!("Prompt {}", i),
-            );
+            let prompt = PromptNode::new(session.id, format!("Prompt {}", i));
             nodes.push(Node::Prompt(prompt));
         }
 
@@ -383,7 +359,10 @@ mod tests {
         let backend = AsyncSledBackend::open(dir.path()).await.unwrap();
 
         let session = ConversationSession::new();
-        backend.store_node(&Node::Session(session.clone())).await.unwrap();
+        backend
+            .store_node(&Node::Session(session.clone()))
+            .await
+            .unwrap();
 
         // Add 20 prompts
         for i in 0..20 {
@@ -410,7 +389,10 @@ mod tests {
         let backend = AsyncSledBackend::open(dir.path()).await.unwrap();
 
         let session = ConversationSession::new();
-        backend.store_node(&Node::Session(session.clone())).await.unwrap();
+        backend
+            .store_node(&Node::Session(session.clone()))
+            .await
+            .unwrap();
 
         // Add 15 prompts
         for i in 0..15 {
@@ -432,7 +414,10 @@ mod tests {
         let backend = AsyncSledBackend::open(dir.path()).await.unwrap();
 
         let session = ConversationSession::new();
-        backend.store_node(&Node::Session(session.clone())).await.unwrap();
+        backend
+            .store_node(&Node::Session(session.clone()))
+            .await
+            .unwrap();
 
         // Add 50 prompts
         for i in 0..50 {

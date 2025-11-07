@@ -1,6 +1,6 @@
 //! Sled-based storage backend implementation
 
-use super::{Serializer, SerializationFormat, StorageBackend, StorageStats};
+use super::{SerializationFormat, Serializer, StorageBackend, StorageStats};
 use crate::error::{Error, Result};
 use crate::types::{Edge, EdgeId, Node, NodeId, SessionId};
 use sled::{Db, Tree};
@@ -40,10 +40,7 @@ impl SledBackend {
     }
 
     /// Open with a custom serialization format
-    pub fn open_with_format<P: AsRef<Path>>(
-        path: P,
-        format: SerializationFormat,
-    ) -> Result<Self> {
+    pub fn open_with_format<P: AsRef<Path>>(path: P, format: SerializationFormat) -> Result<Self> {
         let mut backend = Self::open(path)?;
         backend.serializer = Serializer::new(format);
         Ok(backend)
@@ -77,7 +74,8 @@ impl StorageBackend for SledBackend {
                 if let Some(prompt_bytes) = self.nodes.get(r.prompt_id.to_bytes())? {
                     if let Ok(prompt_node) = self.serializer.deserialize_node(&prompt_bytes) {
                         if let Node::Prompt(p) = prompt_node {
-                            let key = Self::build_index_key(&p.session_id.to_bytes(), &id.to_bytes());
+                            let key =
+                                Self::build_index_key(&p.session_id.to_bytes(), &id.to_bytes());
                             self.session_index.insert(key, &[])?;
                         }
                     }
@@ -163,7 +161,8 @@ impl StorageBackend for SledBackend {
             let (key, _) = result?;
             // Extract node ID from composite key (skip session_id bytes)
             if key.len() >= 32 {
-                let node_id_bytes: [u8; 16] = key[16..32].try_into()
+                let node_id_bytes: [u8; 16] = key[16..32]
+                    .try_into()
                     .map_err(|_| Error::Storage("Invalid node ID in index".to_string()))?;
                 let node_id = NodeId::from_bytes(node_id_bytes);
 
@@ -184,7 +183,8 @@ impl StorageBackend for SledBackend {
             let (key, _) = result?;
             // Extract edge ID from composite key
             if key.len() >= 32 {
-                let edge_id_bytes: [u8; 16] = key[16..32].try_into()
+                let edge_id_bytes: [u8; 16] = key[16..32]
+                    .try_into()
                     .map_err(|_| Error::Storage("Invalid edge ID in index".to_string()))?;
                 let edge_id = EdgeId::from_bytes(edge_id_bytes);
 
@@ -205,7 +205,8 @@ impl StorageBackend for SledBackend {
             let (key, _) = result?;
             // Extract edge ID from composite key
             if key.len() >= 32 {
-                let edge_id_bytes: [u8; 16] = key[16..32].try_into()
+                let edge_id_bytes: [u8; 16] = key[16..32]
+                    .try_into()
                     .map_err(|_| Error::Storage("Invalid edge ID in index".to_string()))?;
                 let edge_id = EdgeId::from_bytes(edge_id_bytes);
 

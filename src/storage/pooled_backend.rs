@@ -54,7 +54,7 @@ pub struct PoolConfig {
 impl Default for PoolConfig {
     fn default() -> Self {
         Self {
-            max_concurrent: 100, // Allow 100 concurrent operations
+            max_concurrent: 100,      // Allow 100 concurrent operations
             acquire_timeout_ms: 5000, // 5 second timeout
             enable_metrics: true,
         }

@@ -6,9 +6,7 @@
 //! Run with: cargo run --example async_streaming_queries
 
 use futures::stream::StreamExt;
-use llm_memory_graph::{
-    engine::AsyncMemoryGraph, types::NodeType, types::TokenUsage, Config,
-};
+use llm_memory_graph::{engine::AsyncMemoryGraph, types::NodeType, types::TokenUsage, Config};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -25,9 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Add 1000 prompts to demonstrate streaming
     for i in 0..1000 {
         let prompt_content = format!("Query {}: What is topic number {}?", i, i);
-        let prompt_id = graph
-            .add_prompt(session.id, prompt_content, None)
-            .await?;
+        let prompt_id = graph.add_prompt(session.id, prompt_content, None).await?;
 
         // Add response to every 5th prompt
         if i % 5 == 0 {
@@ -116,7 +112,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .count()
         .await?;
 
-    println!("Total responses (counted efficiently): {}\n", response_count);
+    println!(
+        "Total responses (counted efficiently): {}\n",
+        response_count
+    );
 
     // Example 4: Time range filtering
     println!("--- Example 4: Time Range Filtering ---");
@@ -155,7 +154,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         response_count_stream += 1;
     }
 
-    println!("Streamed {} responses (with limit 50)", response_count_stream);
+    println!(
+        "Streamed {} responses (with limit 50)",
+        response_count_stream
+    );
     println!();
 
     // Example 6: Multiple queries with filtering combinations
@@ -181,7 +183,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .execute()
         .await?;
 
-    println!("First page of responses (10 items): {}", first_page_responses.len());
+    println!(
+        "First page of responses (10 items): {}",
+        first_page_responses.len()
+    );
     println!();
 
     // Example 7: Processing large datasets in chunks with streaming
@@ -204,7 +209,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         if chunk.len() >= chunk_size {
             // Process chunk
             processed += chunk.len();
-            println!("  Processed chunk of {} items (total: {})", chunk.len(), processed);
+            println!(
+                "  Processed chunk of {} items (total: {})",
+                chunk.len(),
+                processed
+            );
             chunk.clear();
         }
     }
@@ -212,7 +221,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Process remaining items
     if !chunk.is_empty() {
         processed += chunk.len();
-        println!("  Processed final chunk of {} items (total: {})", chunk.len(), processed);
+        println!(
+            "  Processed final chunk of {} items (total: {})",
+            chunk.len(),
+            processed
+        );
     }
     println!();
 
@@ -231,7 +244,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("1. Use execute_stream() for memory-efficient processing of large datasets");
     println!("2. Use execute() for loading all results at once (with pagination)");
     println!("3. Use count() to get totals without loading data");
-    println!("4. Combine filters (session, node_type, time_range, limit, offset) for precise queries");
+    println!(
+        "4. Combine filters (session, node_type, time_range, limit, offset) for precise queries"
+    );
     println!("5. Process data in chunks to balance memory usage and performance");
     println!("6. Leverage async/await for non-blocking I/O operations");
 

@@ -29,9 +29,8 @@ fn bench_pool_overhead(c: &mut Criterion) {
             || {
                 let dir = tempdir().unwrap();
                 let config = Config::new(dir.path());
-                let backend = runtime.block_on(async {
-                    AsyncSledBackend::open(&config.path).await.unwrap()
-                });
+                let backend =
+                    runtime.block_on(async { AsyncSledBackend::open(&config.path).await.unwrap() });
                 (backend, create_test_node(SessionId::new(), 0))
             },
             |(backend, node)| {
@@ -51,7 +50,9 @@ fn bench_pool_overhead(c: &mut Criterion) {
                 let dir = tempdir().unwrap();
                 let config = Config::new(dir.path());
                 let backend = runtime.block_on(async {
-                    PooledAsyncBackend::open(&config.path, PoolConfig::default()).await.unwrap()
+                    PooledAsyncBackend::open(&config.path, PoolConfig::default())
+                        .await
+                        .unwrap()
                 });
                 (backend, create_test_node(SessionId::new(), 0))
             },
@@ -106,7 +107,9 @@ fn bench_pool_overhead(c: &mut Criterion) {
                 let dir = tempdir().unwrap();
                 let config = Config::new(dir.path());
                 runtime.block_on(async {
-                    let backend = PooledAsyncBackend::open(&config.path, PoolConfig::default()).await.unwrap();
+                    let backend = PooledAsyncBackend::open(&config.path, PoolConfig::default())
+                        .await
+                        .unwrap();
                     let session_id = SessionId::new();
                     let mut node_ids = Vec::new();
 
@@ -159,7 +162,9 @@ fn bench_pool_sizes(c: &mut Criterion) {
                                     acquire_timeout_ms: 5000,
                                     enable_metrics: true,
                                 };
-                                let pooled = PooledAsyncBackend::open(&config.path, pool_config).await.unwrap();
+                                let pooled = PooledAsyncBackend::open(&config.path, pool_config)
+                                    .await
+                                    .unwrap();
                                 let session_id = SessionId::new();
                                 (Arc::new(pooled), session_id)
                             })
@@ -207,11 +212,13 @@ fn bench_backpressure(c: &mut Criterion) {
                 let config = Config::new(dir.path());
                 runtime.block_on(async {
                     let pool_config = PoolConfig {
-                        max_concurrent: 10,  // Small pool
-                        acquire_timeout_ms: 10000,  // Generous timeout
+                        max_concurrent: 10,        // Small pool
+                        acquire_timeout_ms: 10000, // Generous timeout
                         enable_metrics: true,
                     };
-                    let pooled = PooledAsyncBackend::open(&config.path, pool_config).await.unwrap();
+                    let pooled = PooledAsyncBackend::open(&config.path, pool_config)
+                        .await
+                        .unwrap();
                     let session_id = SessionId::new();
                     (Arc::new(pooled), session_id)
                 })
@@ -247,11 +254,13 @@ fn bench_backpressure(c: &mut Criterion) {
                 let config = Config::new(dir.path());
                 runtime.block_on(async {
                     let pool_config = PoolConfig {
-                        max_concurrent: 100,  // Balanced pool
+                        max_concurrent: 100, // Balanced pool
                         acquire_timeout_ms: 5000,
                         enable_metrics: true,
                     };
-                    let pooled = PooledAsyncBackend::open(&config.path, pool_config).await.unwrap();
+                    let pooled = PooledAsyncBackend::open(&config.path, pool_config)
+                        .await
+                        .unwrap();
                     let session_id = SessionId::new();
                     (Arc::new(pooled), session_id)
                 })
@@ -300,7 +309,9 @@ fn bench_metrics_overhead(c: &mut Criterion) {
                         acquire_timeout_ms: 5000,
                         enable_metrics: true,
                     };
-                    let pooled = PooledAsyncBackend::open(&config.path, pool_config).await.unwrap();
+                    let pooled = PooledAsyncBackend::open(&config.path, pool_config)
+                        .await
+                        .unwrap();
                     let session_id = SessionId::new();
                     (Arc::new(pooled), session_id)
                 })
@@ -342,7 +353,9 @@ fn bench_metrics_overhead(c: &mut Criterion) {
                         acquire_timeout_ms: 5000,
                         enable_metrics: false,
                     };
-                    let pooled = PooledAsyncBackend::open(&config.path, pool_config).await.unwrap();
+                    let pooled = PooledAsyncBackend::open(&config.path, pool_config)
+                        .await
+                        .unwrap();
                     let session_id = SessionId::new();
                     (Arc::new(pooled), session_id)
                 })
@@ -394,7 +407,9 @@ fn bench_batch_operations(c: &mut Criterion) {
                                 acquire_timeout_ms: 10000,
                                 enable_metrics: true,
                             };
-                            let pooled = PooledAsyncBackend::open(&config.path, pool_config).await.unwrap();
+                            let pooled = PooledAsyncBackend::open(&config.path, pool_config)
+                                .await
+                                .unwrap();
                             let session_id = SessionId::new();
 
                             // Create batch of nodes
@@ -437,7 +452,9 @@ fn bench_mixed_workload(c: &mut Criterion) {
                         acquire_timeout_ms: 5000,
                         enable_metrics: true,
                     };
-                    let pooled = PooledAsyncBackend::open(&config.path, pool_config).await.unwrap();
+                    let pooled = PooledAsyncBackend::open(&config.path, pool_config)
+                        .await
+                        .unwrap();
                     let session_id = SessionId::new();
 
                     // Pre-populate with 100 nodes
@@ -461,9 +478,7 @@ fn bench_mixed_workload(c: &mut Criterion) {
                     for i in 0..70 {
                         let b: Arc<PooledAsyncBackend> = Arc::clone(&backend);
                         let id = node_ids[i % node_ids.len()];
-                        let handle = tokio::spawn(async move {
-                            b.get_node(&id).await
-                        });
+                        let handle = tokio::spawn(async move { b.get_node(&id).await });
                         read_handles.push(handle);
                     }
 

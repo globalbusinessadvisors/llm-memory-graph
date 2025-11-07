@@ -638,7 +638,8 @@ impl AgentNode {
         } else {
             self.metrics.failed_tasks += 1;
         }
-        self.metrics.update_average_latency(latency_ms, current_count);
+        self.metrics
+            .update_average_latency(latency_ms, current_count);
         self.metrics.total_tokens_used += tokens;
         self.record_activity();
     }
@@ -1515,24 +1516,16 @@ mod tests {
 
     #[test]
     fn test_prompt_template_with_description() {
-        let template = PromptTemplate::new(
-            "Test".to_string(),
-            "{{content}}".to_string(),
-            vec![],
-        )
-        .with_description("A test template".to_string());
+        let template = PromptTemplate::new("Test".to_string(), "{{content}}".to_string(), vec![])
+            .with_description("A test template".to_string());
 
         assert_eq!(template.description, "A test template");
     }
 
     #[test]
     fn test_prompt_template_with_author() {
-        let template = PromptTemplate::new(
-            "Test".to_string(),
-            "{{content}}".to_string(),
-            vec![],
-        )
-        .with_author("John Doe".to_string());
+        let template = PromptTemplate::new("Test".to_string(), "{{content}}".to_string(), vec![])
+            .with_author("John Doe".to_string());
 
         assert_eq!(template.author, "John Doe");
     }
@@ -1646,11 +1639,8 @@ mod tests {
 
     #[test]
     fn test_prompt_template_usage_tracking() {
-        let mut template = PromptTemplate::new(
-            "Test".to_string(),
-            "{{content}}".to_string(),
-            vec![],
-        );
+        let mut template =
+            PromptTemplate::new("Test".to_string(), "{{content}}".to_string(), vec![]);
 
         assert_eq!(template.usage_count, 0);
 
@@ -1663,11 +1653,8 @@ mod tests {
 
     #[test]
     fn test_prompt_template_version_bumping() {
-        let mut template = PromptTemplate::new(
-            "Test".to_string(),
-            "{{content}}".to_string(),
-            vec![],
-        );
+        let mut template =
+            PromptTemplate::new("Test".to_string(), "{{content}}".to_string(), vec![]);
 
         assert_eq!(template.version, Version::new(1, 0, 0));
 
@@ -1697,11 +1684,8 @@ mod tests {
 
     #[test]
     fn test_prompt_template_tags() {
-        let mut template = PromptTemplate::new(
-            "Test".to_string(),
-            "{{content}}".to_string(),
-            vec![],
-        );
+        let mut template =
+            PromptTemplate::new("Test".to_string(), "{{content}}".to_string(), vec![]);
 
         assert_eq!(template.tags.len(), 0);
 
@@ -1715,11 +1699,8 @@ mod tests {
 
     #[test]
     fn test_prompt_template_metadata() {
-        let mut template = PromptTemplate::new(
-            "Test".to_string(),
-            "{{content}}".to_string(),
-            vec![],
-        );
+        let mut template =
+            PromptTemplate::new("Test".to_string(), "{{content}}".to_string(), vec![]);
 
         assert_eq!(template.metadata.len(), 0);
 
@@ -1727,7 +1708,10 @@ mod tests {
         template.add_metadata("priority".to_string(), "high".to_string());
 
         assert_eq!(template.metadata.len(), 2);
-        assert_eq!(template.metadata.get("category"), Some(&"greeting".to_string()));
+        assert_eq!(
+            template.metadata.get("category"),
+            Some(&"greeting".to_string())
+        );
         assert_eq!(template.metadata.get("priority"), Some(&"high".to_string()));
     }
 }

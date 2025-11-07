@@ -10,7 +10,7 @@
 use llm_memory_graph::{
     AgentNode, Config, ContextType, EdgeType, InheritsProperties, InstantiatesProperties,
     InvokesProperties, MemoryGraph, Priority, PromptTemplate, ReferencesProperties, TokenUsage,
-    TransfersToProperties, ToolInvocation, VariableSpec,
+    ToolInvocation, TransfersToProperties, VariableSpec,
 };
 use std::collections::HashMap;
 use tempfile::tempdir;
@@ -50,11 +50,8 @@ fn test_instantiates_edge_full_workflow() {
 
     // Create INSTANTIATES edge with properties
     let instantiate_props = InstantiatesProperties::new(template_version, values);
-    let edge = llm_memory_graph::types::Edge::instantiates(
-        prompt_id,
-        template_node_id,
-        instantiate_props,
-    );
+    let edge =
+        llm_memory_graph::types::Edge::instantiates(prompt_id, template_node_id, instantiate_props);
 
     graph.add_edge(edge.from, edge.to, edge.edge_type).unwrap();
 
@@ -102,11 +99,8 @@ fn test_inherits_edge_full_workflow() {
         1,
     );
 
-    let edge = llm_memory_graph::types::Edge::inherits(
-        child_node_id,
-        parent_node_id,
-        inherits_props,
-    );
+    let edge =
+        llm_memory_graph::types::Edge::inherits(child_node_id, parent_node_id, inherits_props);
 
     graph.add_edge(edge.from, edge.to, edge.edge_type).unwrap();
 
@@ -208,11 +202,8 @@ fn test_transfers_to_edge_full_workflow() {
         Priority::High,
     );
 
-    let edge = llm_memory_graph::types::Edge::transfers_to(
-        response_id,
-        agent_node_id,
-        transfer_props,
-    );
+    let edge =
+        llm_memory_graph::types::Edge::transfers_to(response_id, agent_node_id, transfer_props);
 
     graph.add_edge(edge.from, edge.to, edge.edge_type).unwrap();
 
@@ -267,13 +258,16 @@ fn test_references_edge_full_workflow() {
         ReferencesProperties::new(ContextType::Document, 0.95, Some("section_3.2".to_string()));
 
     let edge1 = llm_memory_graph::types::Edge::references(prompt_id, doc_context_id, ref1_props);
-    graph.add_edge(edge1.from, edge1.to, edge1.edge_type).unwrap();
+    graph
+        .add_edge(edge1.from, edge1.to, edge1.edge_type)
+        .unwrap();
 
     let ref2_props = ReferencesProperties::new(ContextType::WebPage, 0.72, None);
 
-    let edge2 =
-        llm_memory_graph::types::Edge::references(prompt_id, web_context_id, ref2_props);
-    graph.add_edge(edge2.from, edge2.to, edge2.edge_type).unwrap();
+    let edge2 = llm_memory_graph::types::Edge::references(prompt_id, web_context_id, ref2_props);
+    graph
+        .add_edge(edge2.from, edge2.to, edge2.edge_type)
+        .unwrap();
 
     // Verify edges
     let edges = graph.get_outgoing_edges(prompt_id).unwrap();
@@ -299,11 +293,7 @@ fn test_edge_property_persistence() {
         let graph = MemoryGraph::open(config).unwrap();
         let session = graph.create_session().unwrap();
 
-        let template = PromptTemplate::new(
-            "Test".to_string(),
-            "{{content}}".to_string(),
-            vec![],
-        );
+        let template = PromptTemplate::new("Test".to_string(), "{{content}}".to_string(), vec![]);
         template_id = template.node_id;
         graph.create_template(template).unwrap();
 
@@ -317,9 +307,7 @@ fn test_edge_property_persistence() {
         let props = InstantiatesProperties::new("1.0.0".to_string(), bindings);
         let edge = llm_memory_graph::types::Edge::instantiates(prompt_id, template_id, props);
 
-        graph
-            .add_edge(edge.from, edge.to, edge.edge_type)
-            .unwrap();
+        graph.add_edge(edge.from, edge.to, edge.edge_type).unwrap();
         graph.flush().unwrap();
     }
 
@@ -415,7 +403,11 @@ fn test_complex_multi_edge_workflow() {
     let transfer_edge =
         llm_memory_graph::types::Edge::transfers_to(response_id, agent_id, transfer_props);
     graph
-        .add_edge(transfer_edge.from, transfer_edge.to, transfer_edge.edge_type)
+        .add_edge(
+            transfer_edge.from,
+            transfer_edge.to,
+            transfer_edge.edge_type,
+        )
         .unwrap();
 
     // Verify all edges
@@ -471,9 +463,7 @@ fn test_priority_levels_in_transfers() {
         );
 
         let edge = llm_memory_graph::types::Edge::transfers_to(response_id, agent_id, props);
-        graph
-            .add_edge(edge.from, edge.to, edge.edge_type)
-            .unwrap();
+        graph.add_edge(edge.from, edge.to, edge.edge_type).unwrap();
     }
 
     // Verify all transfer edges were created
@@ -507,9 +497,7 @@ fn test_context_types_in_references() {
 
         let props = ReferencesProperties::new(*ctx_type, 0.8, Some(format!("chunk_{}", i)));
         let edge = llm_memory_graph::types::Edge::references(prompt_id, context_id, props);
-        graph
-            .add_edge(edge.from, edge.to, edge.edge_type)
-            .unwrap();
+        graph.add_edge(edge.from, edge.to, edge.edge_type).unwrap();
     }
 
     // Verify all reference edges

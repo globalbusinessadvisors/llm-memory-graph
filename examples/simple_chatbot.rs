@@ -51,10 +51,7 @@ fn display_history(graph: &MemoryGraph, session_id: llm_memory_graph::SessionId)
     let traversal = GraphTraversal::new(graph);
 
     // Get all nodes in the session
-    let nodes = match QueryBuilder::new(graph)
-        .session(session_id)
-        .execute()
-    {
+    let nodes = match QueryBuilder::new(graph).session(session_id).execute() {
         Ok(nodes) => nodes,
         Err(e) => {
             eprintln!("Error retrieving history: {}", e);
@@ -80,14 +77,18 @@ fn display_history(graph: &MemoryGraph, session_id: llm_memory_graph::SessionId)
     // Display each prompt with its responses
     for prompt in prompts {
         println!("\nUser: {}", prompt.content);
-        println!("  [Model: {}, Temp: {}]", prompt.metadata.model, prompt.metadata.temperature);
+        println!(
+            "  [Model: {}, Temp: {}]",
+            prompt.metadata.model, prompt.metadata.temperature
+        );
 
         // Find responses to this prompt
         if let Ok(prompt_responses) = traversal.find_responses(prompt.id) {
             for resp_node in prompt_responses {
                 if let llm_memory_graph::types::Node::Response(resp) = resp_node {
                     println!("\nBot: {}", resp.content);
-                    println!("  [Tokens: {} prompt + {} completion = {} total, Latency: {}ms]",
+                    println!(
+                        "  [Tokens: {} prompt + {} completion = {} total, Latency: {}ms]",
                         resp.usage.prompt_tokens,
                         resp.usage.completion_tokens,
                         resp.usage.total_tokens,
@@ -184,11 +185,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         // Add the user's prompt to the graph
-        let prompt_id = graph.add_prompt(
-            session.id,
-            input.to_string(),
-            Some(prompt_metadata.clone()),
-        )?;
+        let prompt_id =
+            graph.add_prompt(session.id, input.to_string(), Some(prompt_metadata.clone()))?;
 
         // Simulate LLM processing with latency tracking
         print!("Bot: ");
@@ -208,12 +206,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             custom: HashMap::new(),
         };
 
-        graph.add_response(
-            prompt_id,
-            response_text,
-            usage,
-            Some(response_metadata),
-        )?;
+        graph.add_response(prompt_id, response_text, usage, Some(response_metadata))?;
 
         // Flush to ensure persistence
         graph.flush()?;

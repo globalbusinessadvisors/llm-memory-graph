@@ -41,10 +41,7 @@ fn execute_web_search(query: &str) -> Result<serde_json::Value, String> {
 
 /// Simulate a calculator tool
 fn execute_calculator(operation: &str, a: f64, b: f64) -> Result<serde_json::Value, String> {
-    println!(
-        "  🧮 Executing calculator: {} {} {}",
-        a, operation, b
-    );
+    println!("  🧮 Executing calculator: {} {} {}", a, operation, b);
     thread::sleep(Duration::from_millis(50)); // Simulate processing
 
     let result = match operation {
@@ -414,7 +411,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("  Total invocations: {}", total_tools);
     println!("  Successful: {}", successful_tools);
     println!("  Failed: {}", failed_tools);
-    println!("  Success rate: {:.1}%", (successful_tools as f64 / total_tools as f64) * 100.0);
+    println!(
+        "  Success rate: {:.1}%",
+        (successful_tools as f64 / total_tools as f64) * 100.0
+    );
 
     println!("\n✅ Demo completed successfully!");
     println!("Database persisted at: ./data/tool_demo.db");
