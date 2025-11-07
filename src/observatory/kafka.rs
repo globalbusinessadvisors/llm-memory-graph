@@ -124,6 +124,7 @@ pub struct ProducerStats {
 /// Mock Kafka producer for testing and development
 #[derive(Clone)]
 pub struct MockKafkaProducer {
+    #[allow(dead_code)]
     config: KafkaConfig,
     /// Sent events buffer for testing
     sent_events: Arc<RwLock<Vec<MemoryGraphEvent>>>,
